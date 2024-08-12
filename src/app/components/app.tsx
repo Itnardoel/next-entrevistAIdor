@@ -2,14 +2,15 @@
 
 import {useEffect, useState} from "react";
 
-import ChatMessages from "../components/chatMessages";
-import FormMessages from "../components/formMessages";
-import SelectVoices from "../components/selectVoices";
 import {type Message} from "../types";
 import {getAnswer as getServerAnswer} from "../actions/action";
 
+import ChatMessages from "./chatMessages";
+import FormMessages from "./formMessages";
+import SelectVoices from "./selectVoices";
+
 const recognition = new webkitSpeechRecognition();
-const synth = window.speechSynthesis;
+const synth = speechSynthesis;
 
 recognition.continuous = true;
 recognition.lang = "es-AR";
@@ -38,6 +39,11 @@ export default function App() {
     setVoices(synth.getVoices());
   }, []);
 
+  // fired when the list of SpeechSynthesisVoice objects that would be returned by the SpeechSynthesis.getVoices() method has changed
+  synth.onvoiceschanged = () => {
+    setVoices(synth.getVoices());
+  };
+
   function saveMessages(role: "user" | "model", message: string) {
     setMessages((prevMessages) => {
       const newMessage = {
@@ -47,20 +53,6 @@ export default function App() {
 
       return [...prevMessages, newMessage];
     });
-  }
-
-  async function getAnswer(message: string) {
-    const answer = await fetch("/gemini", {
-      method: "POST",
-      body: JSON.stringify({text: message}),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json() as Promise<{message: string}>)
-      .then((data) => data.message);
-
-    return answer;
   }
 
   recognition.onspeechstart = () => {
@@ -79,7 +71,7 @@ export default function App() {
   recognition.onspeechend = async () => {
     saveMessages("user", buffer);
 
-    const answer = await getAnswer(buffer);
+    const answer = await getServerAnswer(buffer);
 
     saveMessages("model", answer);
 
@@ -101,8 +93,6 @@ export default function App() {
     setIsLoading(true);
 
     saveMessages("user", textMessage);
-
-    // const answer = await getAnswer(textMessage);
 
     const answer = await getServerAnswer(textMessage);
 

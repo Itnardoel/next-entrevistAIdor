@@ -1,10 +1,9 @@
 import dynamic from "next/dynamic";
 
-const DynamicTest = dynamic(async () => import("./components/test"), {
+const DynamicApp = dynamic(async () => import("./components/app"), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
 });
 
 export default function Home() {
-  return <DynamicTest />;
+  return <DynamicApp />;
 }
