@@ -1,7 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import ChatMessages from "../components/chatMessages";
 import FormMessages from "../components/formMessages";
@@ -20,7 +19,7 @@ recognition.start();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>(synth.getVoices());
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [language, setLanguage] = useState("");
   const [buffer, setBuffer] = useState("");
   const [messages, setMessages] = useState<Message[]>([
@@ -34,6 +33,10 @@ export default function App() {
     },
   ]);
   const [textMessage, setTextMessage] = useState("");
+
+  useEffect(() => {
+    setVoices(synth.getVoices());
+  }, []);
 
   function saveMessages(role: "user" | "model", message: string) {
     setMessages((prevMessages) => {
