@@ -28,7 +28,7 @@ export default function App() {
       role: "model",
       parts: [
         {
-          text: "¡Hola! 👋 Bienvenido/a a EntrevistAIdor. Para una mejor experiencia, la aplicación siempre escuchará tu voz si lo permitís, pero también podés escribir tu mensaje. No olvides elegir a tu entrevistador en la parte inferior de la pantalla para poder escucharlo 👇. ¡Comencemos!",
+          text: "¡Hola! 👋 Bienvenido/a a EntrevistAIdor. Para una mejor experiencia, la aplicación siempre escuchará tu voz si lo permitís, pero también podés escribir tu mensaje. No olvides elegir a tu entrevistador en la parte inferior de la pantalla para poder escucharlo 👇 (Microsoft Edge hay muchas más). ¡Comencemos!",
         },
       ],
     },
@@ -69,11 +69,15 @@ export default function App() {
   };
 
   recognition.onspeechend = async () => {
+    setIsLoading(true);
+
     saveMessages("user", buffer);
 
     const answer = await getServerAnswer(buffer);
 
     saveMessages("model", answer);
+
+    setIsLoading(false);
 
     const utterance = new SpeechSynthesisUtterance(answer);
 
@@ -120,7 +124,10 @@ export default function App() {
         <SelectVoices setLanguage={setLanguage} voices={voices} />
       </section>
       <footer className="text-center leading-[4rem] opacity-70">
-        © {new Date().getFullYear()} EntrevistAIdor
+        © {new Date().getFullYear()} EntrevistAIdor idea by{" "}
+        <a href="https://github.com/goncy" rel="noopener noreferrer" target="_blank">
+          Goncy
+        </a>
       </footer>
     </main>
   );
